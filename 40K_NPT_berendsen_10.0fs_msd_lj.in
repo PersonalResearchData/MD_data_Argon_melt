@@ -1,13 +1,10 @@
-# 0) Rename logfile
-log out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/log.lammps
-
 # 1) Initialization
 units real
 atom_style  atomic
 
 # 2) Setup simulation box
 boundary  p p p
-read_data out/100K_NVT_berendsen_10.0fs_dt_lj/last_config.atoms
+read_data last_config.atoms
 
 # 3) Setup atoms
 mass 1 39.95
@@ -31,25 +28,16 @@ fix 3 all press/berendsen iso 1.0 1.0 $(2000.0*dt) #2.0 ps = 2000.0 fs for press
 compute myMSD all msd
 
 # 7) Output
-thermo_style  custom step time temp press vol density ke pe etotal
-thermo  10
-dump  1 all xyz 100 out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/lj.xyz
-dump  2 all atom 100 out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/dump.lammpstrj
-dump_modify 1 sort id element Ar
-
-
-# 7) Output
 thermo_style  custom step time temp press vol density ke pe etotal
 thermo  10
-dump  1 all xyz 100 out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/lj.xyz
-dump 2 all custom 100 out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/dump.lammpstrj id element xs ys zs
+dump  1 all xyz 100 lj.xyz
+dump 2 all custom 100 dump.lammpstrj id element xs ys zs
 dump_modify 1 sort id element Ar
 dump_modify 2 element Ar # dump 2 で原子タイプ1を 'Ar' として出力するように設定
 
-
 # Print MSD to a separate file
-fix MSDOut all ave/time 100 10 1000 c_myMSD[1] c_myMSD[2] c_myMSD[3] c_myMSD[4] file out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/msd.txt mode scalar
+fix MSDOut all ave/time 100 10 1000 c_myMSD[1] c_myMSD[2] c_myMSD[3] c_myMSD[4] file msd.txt mode scalar
 
 # 8) Actions
 run 1000000 #steps
-write_data out/40K_1atm_NPT_berendsen_10.0fs_msd_lj/last_config.atoms nocoeff
+write_data last_config.atoms nocoeff
